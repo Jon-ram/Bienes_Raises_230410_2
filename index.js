@@ -1,19 +1,15 @@
-import express from 'express';
 //const express = require('express');
-const port = 3001;
+import express from 'express';
+import generalRoutes from './routes/generalRoutes.js'
+import userRoutes from './routes/userRoutes.js'
+
+const port = 3000;
+
 const app = express();
 
-app.listen(port, () =>
-    console.log(`La aplicacionha iniciado en el puerto: ${port}`))
-// ? Routing - Enrutacion para peticiones
-app.get("/", function(req, res){
-    res.send("Hola desde la web en NodeJS")
+app.listen(port, ()=>{
+   console.log(`La aplicación ha iniciado en el puesto: ${port}`);
 })
-app.get("/quienEres",function(req, res){
-    res.json({
-        "nombre" : "Jonathan Baldemar Ramirez Reyes",
-        "carrera" : "TI DSM",
-        "grado" : "4",
-        "grupo" : "B"
-    })
-})
+
+app.use("/", generalRoutes);
+app.use("/usuario/",userRoutes);
