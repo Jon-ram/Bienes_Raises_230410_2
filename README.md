@@ -8,7 +8,8 @@ Para poder demostrar y aprender la creacion y consumo de interfaces en programai
 
 |No.|Feacha|Descripcion|Potenciador|Estatus|
 |--|--|--|--|--|
-|8.|17/10/2024|Nuevo Repositorio del proyecto implementacion .gitignore|1|👌Activa|
+|8.|17/10/2024|Nuevo Repositorio del proyecto implementacion .gitignore|1|✅Finalizada|
+|9.|22/10/2024|Creación de una Aplicación Web usando Express| 12|✅Finalizada|
 
 ### Autor
 **Jonatan Baldemar Ramirez Reyes** / [@jon-ram](https://github.com/Jon-ram)
