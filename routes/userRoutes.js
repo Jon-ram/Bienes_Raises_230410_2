@@ -1,5 +1,5 @@
-import express, { response } from 'express';
-
+import express from 'express';
+import { formularioLogin,formularioRegister,formularioPasswordRecovery } from '../controllers/userController.js';
 const router = express.Router();
 
 //GET
@@ -35,4 +35,7 @@ router.patch("/updatePassword/:email/:newPassword/:passwordConfirm", function(a,
 router.delete("/deleteUser/:name", function(a,b){
     b.send(`Se esta solicitando eliminar el usuario ${a.params.name}`);
 })
+router.get("/login", formularioLogin)
+router.get("/register",formularioRegister)
+router.get("/passwordRecovery",formularioPasswordRecovery)
 export default router;
