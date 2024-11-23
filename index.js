@@ -1,38 +1,41 @@
-//const express = require('express');
 import express from 'express';
-import generalRoutes from './routes/generalRoutes.js'
-import userRoutes from './routes/userRoutes.js'
+import generalRoutes from './Routes/generalRoutes.js'
+import userRoutes from './Routes/userRoutes.js'
 import db from './db/config.js'
+import dotenv from 'dotenv'
 
-const app = express();
+dotenv.config({path: '.env'})
 
-//Conexion a la base de datos 
-try {
-   await db.authenticate(); //Verifico las credenciales del usuario
-   db.sync(); // Sincroniza las tablas 
-   console.log("Conexión establecida");
+//conexión a la base de datos.
+try{
+    await db.authenticate();  //verifica las credenciales del usuario
+    db.sync(); //sincronizo las tablas con los modelos
+    console.log("Conexión correcta a la Base de Datos");
 
-}catch (error) {
-   console.log(error)
+}catch(error){
+    console.log(error);
 }
 
+const app=express()
 
-//Habilitando la lectura de datos del formulario
+//Habilitar la lectura de datos de formularios
 app.use(express.urlencoded({ extended: true }));
 
-//configurar tempñate engine
+
+ 
+//Habilitar Pug 
 app.set('view engine', 'pug')
 app.set('views', './views')
-app.use(express.static('./public'))
-const port = 3000;
+
+//Definir la carpeta pública de recursos estáticos (assets)
+app.use(express.static('./public'));
+
+
+// configuramos nuestro servidor web
+const port= process.env.BACKEND_PORT; 
 app.listen(port, ()=>{
-   console.log(`La aplicación ha iniciado en el puesto: ${port}`);
+    console.log(`La aplicación ha iniciado al puerto: ${port}`);
 })
 
-// Probamos las rutas para poder presentar mensajes al usuario a través del navegador
-app.get("/",function(req,res){
-   res.send("Hola Mundo desde node, a traves del navegador")
-})
-
-app.use("/", generalRoutes);
-app.use("/auth",userRoutes);
+app.use('/',generalRoutes);
+app.use('/auth/',userRoutes);

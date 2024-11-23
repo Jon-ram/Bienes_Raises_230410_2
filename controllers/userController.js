@@ -1,129 +1,128 @@
 import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
-import { generatetId } from '../models/helpers/tokens.js';
-import { emailAfterRegister } from '../models/helpers/emails.js';
+import { generatetid } from '../helpers/tokens.js';
+import { emailAfterRegister } from '../helpers/email.js';
 
+// Renderizar formulario de inicio de sesión
+const formularioLogin = (req, res) => {
+    res.render('auth/login', {
+        autenticado: false,
+        page: 'Ingresa a la plataforma',
+    });
+};
 
+// Renderizar formulario de registro
+const formularioRegister = (req, res) => {
+    res.render('auth/register', {
+        page: 'Crea una nueva cuenta',
+    });
+};
 
-const formularioLogin = (request, response) =>   {
-    response.render("auth/login", {
-        page : "Ingresa a la plataforma"
-    })
-}
+// Crear un nuevo usuario
+const createNewUser = async (req, res) => {
+    // Validaciones
+    await check('nombre_usuario').notEmpty().withMessage('El nombre no puede ir vacío').run(req);
+    await check('correo_usuario').notEmpty().withMessage('El correo electrónico es un campo obligatorio')
+        .isEmail().withMessage('No es un email correcto').run(req);
+    await check('pass_usuario').notEmpty().withMessage('La contraseña es un campo obligatorio')
+        .isLength({ min: 8 }).withMessage('La contraseña debería tener al menos 8 caracteres').run(req);
+    await check('pass2_usuario').equals(req.body.pass_usuario).withMessage('Las contraseñas no coinciden').run(req);
 
-const formularioRegister = (request, response) =>  {
-    response.render('auth/register', {
-        page : "Crea una nueva cuenta..."
-    })};
+    const result = validationResult(req);
 
-const formularioPasswordRecovery = (request, response) =>  {
-response.render('auth/passwordRecovery', {
-        page : "Recuperación de Contraseña"
- })};
-
-
- const createNewUser = async (request, response) => {
-    // Desestructurar los parámetros del request
-    const { nombre_usuario, correo_usuario, password_usuario } = request.body;
-
-    // Verificar que el usuario no existe previamente en la bd
-    const existingUser = await User.findOne({ where: { email: correo_usuario } });
-
-    if (existingUser) {
-        return response.render("auth/register", {
-            page: "Error al intentar crear la cuenta de Usuario",
-            errors: [{ msg: `El usuario ${correo_usuario} ya se encuentra registrado` }],
-            user: { name: nombre_usuario }  // Use nombre_usuario here
-        });
-    }
-
-    console.log("Registrando a un nuevo usuario.");
-    console.log(request.body);
-
-    // Validación de los campos que se reciben del formulario
-    await check('nombre_usuario')
-        .notEmpty().withMessage("El nombre del usuario es un campo obligatorio.")
-        .run(request);
-    await check('correo_usuario')
-        .notEmpty().withMessage("El correo electrónico es un campo obligatorio.")
-        .isEmail().withMessage("Debe ingresar un correo electrónico válido.")
-        .run(request);
-    await check('password_usuario')
-        .notEmpty().withMessage("La contraseña es un campo obligatorio.")
-        .isLength({ min: 8 }).withMessage("La contraseña debe ser de al menos 8 caracteres.")
-        .run(request);
-    await check('pass2_usuario')
-        .equals(request.body.password_usuario).withMessage("La contraseña y su confirmación deben coincidir.")
-        .run(request);
-
-    let result = validationResult(request);
-
-    // Verificación si hay errores de validaciones
+    // Si hay errores, regresar al formulario con los mensajes
     if (!result.isEmpty()) {
-        return response.render("auth/register", {
-            page: 'Error al intentar crear la Cuenta de Usuario',
-            errors: result.array()
+        return res.render('auth/register', {
+            page: 'Error al intentar crear la cuenta',
+            errors: result.array(),
+            user: {
+                name: req.body.nombre_usuario,
+                email: req.body.correo_usuario,
+            },
         });
-    } else {
-        console.log("Registrando a nuevo usuario");
-        console.log(request.body);
     }
 
-    // Registro a los datos en la base de datos.
-    const newUser = await User.create({
-        name: nombre_usuario,  // Use nombre_usuario here
-        email: correo_usuario,
-        password: password_usuario,
-        token: generatetId()   // Generate token here
-    });
+    // Desestructurar los parámetros del request
+    const { nombre_usuario: name, correo_usuario: email, pass_usuario: password } = req.body;
 
-    // Enviar el correo de confirmación
-    await emailAfterRegister({
-        name: newUser.name,
-        email: newUser.email,
-        token: newUser.token
-    });
-
-    // Mostrar mensaje de confirmación
-    response.render('templates/message', {
-        page: 'Cuenta creada satisfactoriamente.',
-        msg: `Hemos enviado un correo a: ${correo_usuario}, para la confirmación de su cuenta.` 
+    // Verificar que el usuario no exista
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+        return res.render('auth/register', {
+            page: 'Error al intentar crear la cuenta de Usuario',
+            errors: [{ msg: `El usuario ${email} ya está registrado.` }],
+            user: { name },
         });
-    
+    }
+
+    // Crear nuevo usuario
+    try {
+        const newUser = await User.create({
+            name,
+            email,
+            password,
+            token: generateId(),
+        });
+
+        console.log("Nuevo usuario creado:", newUser);
+
+        // Enviar correo de confirmación
+        emailAfterRegister({
+            name: newUser.name,
+            email: newUser.email,
+            token: newUser.token,
+        });
+
+        res.render('templates/message', {
+            page: 'Cuenta creada correctamente',
+            message: `Hemos enviado un email de confirmación al correo: ${email}`,
+        });
+    } catch (error) {
+        console.error("Error al crear usuario:", error);
+        res.status(500).json({ error: 'Error al registrar el usuario' });
+    }
 };
 
-// Confirmación de cuenta
-const confirm = async (request, response) => {
-    const { token } = request.params;
-    console.log(`Intentando confirmar la cuenta con el token: ${token}`);
+// Confirmar cuenta
+const confirm = async (req, res) => {
+    const { token } = req.params;
+    console.log(`Token recibido: ${token}`); // Verificar si el token se está recibiendo correctamente
 
-    // Validar token, confirmar cuenta y enviar mensaje
-    // Aquí se puede agregar la lógica para confirmar la cuenta
-    const userWithToken = await User.findOne({where: {token}});
-
-    if(!userWithToken){
-        response.render('auth/accountConfirmed', {
-            page: 'Error al confirmar tu cuenta.',
-            msg: 'El token no existe o ya ha sido utilizado, intenta de nuevo.',
-            error: true
-        })
+    // Verificar si el token es válido
+    const user = await User.findOne({ where: { token } });
+    if (!user) {
+        return res.render('auth/confirmAccount', {
+            page: 'Error al confirmar tu cuenta...',
+            msg: 'Hubo un error al confirmar tu cuenta, intenta de nuevo.',
+            error: true,
+        });
     }
-    else
-    {
-        userWithToken.token=null
-        userWithToken.confirmed=true;
-        await userWithToken.save();
 
-        response.render('auth/accountConfirmed', {
-            page: 'Excelente..!',
-            msg: 'Tu cuenta ha sido confirmada de manera exitosa.',
-            error: false
-        })
+    // Confirmar la cuenta
+    user.token = null;
+    user.confirmacion = true; 
+    await user.save(); // Guardar cambios
 
-    }
-    
+    console.log("Usuario confirmado:", user);
 
+    res.render('auth/confirmAccount', {
+        page: 'Cuenta Confirmada',
+        msg: 'La cuenta se ha confirmado correctamente.',
+        error: false,
+    });
 };
 
- 
-export {formularioLogin, formularioRegister, formularioPasswordRecovery, createNewUser, confirm}
+// Renderizar formulario de recuperación de contraseña
+const formularioPasswordRecovery = (req, res) => {
+    res.render('auth/passwordRecovery', {
+        page: 'Recupera tu contraseña',
+    });
+};
+
+export {
+    formularioLogin,
+    formularioRegister,
+    createNewUser,
+    confirm,
+    formularioPasswordRecovery,
+};
