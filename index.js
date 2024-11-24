@@ -9,7 +9,7 @@ dotenv.config({path: '.env'})
 //conexión a la base de datos.
 try{
     await db.authenticate();  //verifica las credenciales del usuario
-    db.sync(); //sincronizo las tablas con los modelos
+    await db.sync(); //sincronizo las tablas con los modelos
     console.log("Conexión correcta a la Base de Datos");
 
 }catch(error){

@@ -16,7 +16,8 @@ const db = new Sequelize(process.env.BD_NOMBRE, process.env.BD_USER, process.env
         min: 0,
         acquire: 30000, // Tiempo máximo que una conexión puede estar inactiva
         idle: 10000, // Tiempo máximo que una conexión puede estar inactiva antes de ser cerrada
-    }
+    },
+    logging: console.log, 
 });
 
 export default db;

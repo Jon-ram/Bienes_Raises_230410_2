@@ -19,7 +19,8 @@ const User = db.define('tbb_users',{
     token: DataTypes.STRING,
     confirmacion: DataTypes.BOOLEAN
 
-},{
+}, {
+    timestamps: true, 
     hooks:{
         beforeCreate: async function(user){
             //generamos la clave para el hasheo, se recomiendan, se recomiendan 10 rondas de aleatorización para no consumir demasiados recursos da hardware y hacer lento el proceso.

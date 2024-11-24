@@ -20,6 +20,8 @@ const formularioRegister = (req, res) => {
 
 // Crear un nuevo usuario
 const createNewUser = async (req, res) => {
+    console.log("Datos recibidos:", req.body); // Verifica los datos del formulario
+
     // Validaciones
     await check('nombre_usuario').notEmpty().withMessage('El nombre no puede ir vacío').run(req);
     await check('correo_usuario').notEmpty().withMessage('El correo electrónico es un campo obligatorio')
@@ -29,9 +31,8 @@ const createNewUser = async (req, res) => {
     await check('pass2_usuario').equals(req.body.pass_usuario).withMessage('Las contraseñas no coinciden').run(req);
 
     const result = validationResult(req);
-
-    // Si hay errores, regresar al formulario con los mensajes
     if (!result.isEmpty()) {
+        console.log("Errores de validación:", result.array());
         return res.render('auth/register', {
             page: 'Error al intentar crear la cuenta',
             errors: result.array(),
@@ -42,12 +43,12 @@ const createNewUser = async (req, res) => {
         });
     }
 
-    // Desestructurar los parámetros del request
     const { nombre_usuario: name, correo_usuario: email, pass_usuario: password } = req.body;
 
     // Verificar que el usuario no exista
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
+        console.log("Usuario existente:", existingUser);
         return res.render('auth/register', {
             page: 'Error al intentar crear la cuenta de Usuario',
             errors: [{ msg: `El usuario ${email} ya está registrado.` }],
@@ -55,24 +56,26 @@ const createNewUser = async (req, res) => {
         });
     }
 
+    
     // Crear nuevo usuario
     try {
         const newUser = await User.create({
             name,
             email,
             password,
-            token: generateId(),
+            token: generatetid(),
+            confirmacion: false,
         });
-
-        console.log("Nuevo usuario creado:", newUser);
-
+    
+        console.log("Usuario creado exitosamente:", newUser);
+    
         // Enviar correo de confirmación
-        emailAfterRegister({
+        await emailAfterRegister({
             name: newUser.name,
             email: newUser.email,
             token: newUser.token,
         });
-
+    
         res.render('templates/message', {
             page: 'Cuenta creada correctamente',
             message: `Hemos enviado un email de confirmación al correo: ${email}`,
@@ -81,6 +84,7 @@ const createNewUser = async (req, res) => {
         console.error("Error al crear usuario:", error);
         res.status(500).json({ error: 'Error al registrar el usuario' });
     }
+    
 };
 
 // Confirmar cuenta
@@ -97,7 +101,7 @@ const confirm = async (req, res) => {
             error: true,
         });
     }
-
+    
     // Confirmar la cuenta
     user.token = null;
     user.confirmacion = true; 
