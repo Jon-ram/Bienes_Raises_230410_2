@@ -47,3 +47,43 @@ export const emailAfterRegister = async ({ name, email, token }) => {
         console.error('Error al enviar el correo:', error);
     }
 };
+
+
+export const emailAfterPasswordChange = async ({ name, email }) => {
+    const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: '"Bienes Raíces" <no-reply@bienesraices.com>',
+        to: email,
+        subject: 'Cambio de Contraseña Confirmado',
+        html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
+                <h2 style="text-align: center; color: #4CAF50;">¡Hola, ${name}!</h2>
+                <p style="font-size: 1rem; margin: 15px 0;">
+                    Hemos recibido una solicitud de cambio de contraseña en tu cuenta. Si no fuiste tú, por favor, ignora este mensaje.
+                </p>
+                <p style="font-size: 0.9rem; margin: 15px 0; color: #666;">
+                    Si tuviste algún problema o no solicitaste este cambio, por favor contacta con nuestro soporte.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;">
+                <footer style="text-align: center; font-size: 0.8rem; color: #999;">
+                    © 2024 Bienes Raíces. Todos los derechos reservados.
+                </footer>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Correo de confirmación enviado correctamente');
+    } catch (error) {
+        console.error('Error al enviar el correo de confirmación:', error);
+    }
+};
