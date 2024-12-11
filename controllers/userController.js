@@ -67,6 +67,7 @@ const createNewUser = async (req, res) => {
             password,
             token: generatetid(),
             confirmacion: false,
+            
         });
     
         console.log("Usuario creado exitosamente:", newUser);
