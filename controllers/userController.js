@@ -92,7 +92,7 @@ const authenticate = async (req, res) => {
 // Mostrar formulario de registro
 const formularioRegister = (request, response) => {
     response.render('auth/register', {
-        page: "Crea una Nueva Cuenta...",
+        page: "Crea una Nueva Cuenta",
         csrfToken: request.csrfToken(),
     });
 };
@@ -245,7 +245,7 @@ const resetPassword = async (req, res) => {
     // Renderizar un mensaje
     res.render('templates/message', {
         page: 'Restablece tu Contraseña',
-        msg: `Hemos Enviado un Email a ${correo_usuario} con las instrucciones para Reestablecer su contraseña`,
+        msg: `Hemos Enviado un Email a ${correo_usuario} para Reestablecer su contraseña`,
     });
 };
 

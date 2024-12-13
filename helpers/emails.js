@@ -16,42 +16,31 @@ const registerEmail = async (data) => {
     await transport.sendMail({
         from: 'bienes_raices_230410',
         to: email,
-        subject: 'Confirma tu cuenta...',
+        subject: 'Confirma tu cuenta',
         text: `Estimado ${name}, es necesario que confirme su cuenta para poder acceder a BienesRaices_230410.`,
         html: `
-            <header style="font-family: Arial, Verdana, sans-serif; text-align: center; line-height: 1.2; color: #3A3D98;">
-                <h2 style="color: #2C3E50;">Bienes Raices</h2>
-                <h3 style="color: #3498DB;">Confirmación de correo</h3>
-            </header>
-            <div style="font-family: Arial, Verdana, sans-serif; text-align: justify; line-height: 1.8; color: #2C3E50; background-color: #E8F6F3; padding: 30px; border: 8px solid #2C3E50; border-radius: 10px;">
-                <h2 style="color: #3498DB;">¡Hola, <span style="color: #E74C3C;">${name}</span>!</h2>
-                <div style="padding: 20px; border: dashed #3498DB; border-radius: 15px;">
-                    <p style="font-size: 18px;">
-                        ¡Gracias por registrarte en <strong>BienesRaices_230410</strong>! Para completar el proceso de confirmación de tu cuenta, necesitamos la confirmación de tu correo electrónico.
-                    </p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirm/${token}" 
-                           style="background-color: #3498DB; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-size: 18px;">
-                           Confirmar Cuenta
-                        </a>
-                    </div>
-                </div>
-                <p style="font-size: 16px; color: #555;">
-                    Si no reconoces esta solicitud, puedes ignorar este mensaje. ¡Gracias por elegirnos!
-                </p>
-                <div style="text-align: center; line-height: 1.6;">
-                    <p style="font-size: 18px; color: #555;">
-                        Atentamente, <br>
-                        <strong>Jonathan Baldemar Ramirez Reyes</strong>
-                    </p>
-                    <div style="margin-bottom: 15px;">
-                        <img src="https://i.ibb.co/992pkqJ/firmateco-Photoroom.png" alt="firmateco-Photoroom"" alt="Firma" style="max-width: 150px; border-radius: 5px;">
-                    </div>
-                </div>
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
+            <h2 style="text-align: center; color: #4CAF50;">¡Bienvenido a Bienes Raíces, ${name}!</h2>
+            <p style="font-size: 1rem; margin: 15px 0;">
+                Gracias por registrarte en nuestra plataforma. Estamos encantados de tenerte con nosotros.
+                Por favor, confirma tu cuenta para empezar a disfrutar de todos los beneficios.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirm/${token}"
+                   style="display: inline-block; padding: 12px 20px; font-size: 1rem; color: #fff; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">
+                    Confirmar Cuenta
+                </a>
             </div>
-            <footer style="text-align: center; font-size: 14px; color: #555; margin-top: 20px;">
-                © 2024 BienesRaices_230410
+            <p style="font-size: 0.9rem; margin: 15px 0; color: #666;">
+                Si no creaste esta cuenta, puedes ignorar este correo. Tu información está segura con nosotros.
+            </p>
+            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;">
+            <footer style="text-align: center; font-size: 0.8rem; color: #999;">
+                <img src = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgsEBTNgUF_g7NCT48KidfjeCk_H4Sbj-BuI4Xo1Sh2VlmJOZSHG6rCw-aHj56Aqapx4fxsfEQRjdnmMkFTDynhPgLFfjQmZ6wHbaP9mFno8TippsSaoTBI6IWlm162i-fdmb8i3soOSKMk/w1200-h630-p-k-no-nu/1280px-Firma_C%25C3%25A1mpora.svg.png"
+                    alt="Firma" style="max-width: 150px; height: auto; border-radius:5px; margin: 10px 0; text-align: center;">
+                © 2024 Bienes Raíces. Todos los derechos reservados.
             </footer>
+        </div>
         `,
     });
 }
@@ -75,39 +64,25 @@ const passwordRecoveryEmail = async (data) => {
         subject: 'Restablece tu contraseña...',
         text: `Estimado ${name}, has solicitado el cambio de contraseña de tu cuenta en BienesRaices_230410.`,
         html: `
-            <header style="font-family: Arial, Verdana, sans-serif; text-align: center; line-height: 1.2; color: #3A3D98;">
-                <h2 style="color: #2C3E50;">Bienes Raices</h2>
-                <h3 style="color: #3498DB;">Recuperación de contraseña</h3>
-            </header>
-            <div style="font-family: Arial, Verdana, sans-serif; text-align: justify; line-height: 1.8; color: #2C3E50; background-color: #E8F6F3; padding: 30px; border: 8px solid #2C3E50; border-radius: 10px;">
-                <h2 style="color: #3498DB;">¡Hola, <span style="color: #E74C3C;">${name}</span>!</h2>
-                <div style="padding: 20px; border: dashed #3498DB; border-radius: 15px;">
-                    <p style="font-size: 18px;">
-                        Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>BienesRaices_230410</strong>.
-                    </p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/passwordRecovery/${token}" 
-                           style="background-color: #3498DB; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-size: 18px;">
-                           Restablecer Contraseña
-                        </a>
-                    </div>
-                </div>
-                <p style="font-size: 16px; color: #555;">
-                    Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta seguirá siendo segura.
+               <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
+                <h2 style="text-align: center; color: #4CAF50;">¡Hola, ${name}!</h2>
+                <p style="font-size: 1rem; margin: 15px 0;">
+                    Hemos recibido una solicitud de cambio de contraseña en tu cuenta. Si no fuiste tú, por favor, ignora este mensaje.
                 </p>
-                <div style="text-align: center; line-height: 1.6;">
-                    <p style="font-size: 18px; color: #555;">
-                        Atentamente, <br>
-                        <strong>Jonathan Baldemar Ramirez Reyes</strong>
-                    </p>
-                    <div style="margin-bottom: 15px;">
-                        <img src="https://i.ibb.co/992pkqJ/firmateco-Photoroom.png" alt="firmateco-Photoroom"" alt="Firma" style="max-width: 150px; border-radius: 5px;">
-                    </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/passwordRecovery/${token}" 
+                        style="background-color: #3498DB; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-size: 18px;">
+                        Restablecer Contraseña
+                    </a>
                 </div>
+                <p style="font-size: 0.9rem; margin: 15px 0; color: #666;">
+                    Si tuviste algún problema o no solicitaste este cambio, por favor contacta con nuestro soporte.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;">
+                <footer style="text-align: center; font-size: 0.8rem; color: #999;">
+                    © 2024 Bienes Raíces. Todos los derechos reservados.
+                </footer>
             </div>
-            <footer style="text-align: center; font-size: 14px; color: #555; margin-top: 20px;">
-                © 2024 BienesRaices-230410
-            </footer>
         `,
     });
 }
