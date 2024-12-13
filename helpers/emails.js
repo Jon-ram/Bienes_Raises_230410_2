@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
-export const emailAfterRegister = async ({ name, email, token }) => {
-    const transporter = nodemailer.createTransport({
+const registerEmail = async (data) => {
+    const transport = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         auth: {
@@ -10,10 +10,14 @@ export const emailAfterRegister = async ({ name, email, token }) => {
         },
     });
 
-    const mailOptions = {
-        from: '"Bienes Raíces" <no-reply@bienesraices.com>',
+    const { email, name, token } = data;
+
+    // Enviar el email
+    await transport.sendMail({
+        from: 'bienes_raices_230410',
         to: email,
         subject: 'Confirma tu cuenta',
+        text: `Estimado ${name}, es necesario que confirme su cuenta para poder acceder a BienesRaices_230410.`,
         html: `
             <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
             <h2 style="text-align: center; color: #4CAF50;">¡Bienvenido a Bienes Raíces, ${name}!</h2>
@@ -22,7 +26,7 @@ export const emailAfterRegister = async ({ name, email, token }) => {
                 Por favor, confirma tu cuenta para empezar a disfrutar de todos los beneficios.
             </p>
             <div style="text-align: center; margin: 20px 0;">
-                <a href="${process.env.FRONTEND_URL}/auth/confirmAccount/${token}" 
+                <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirm/${token}"
                    style="display: inline-block; padding: 12px 20px; font-size: 1rem; color: #fff; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">
                     Confirmar Cuenta
                 </a>
@@ -38,37 +42,39 @@ export const emailAfterRegister = async ({ name, email, token }) => {
             </footer>
         </div>
         `,
-    };
+    });
+}
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Correo enviado correctamente');
-    } catch (error) {
-        console.error('Error al enviar el correo:', error);
-    }
-};
-
-
-export const emailAfterPasswordChange = async ({ name, email }) => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
+const passwordRecoveryEmail = async (data) => {
+    const transport = nodemailer.createTransport({
+        host: process.env.Email_HOST,
+        port: process.env.Email_PORT,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            user: process.env.Email_USER,
+            pass: process.env.Email_PASS,
         },
     });
 
-    const mailOptions = {
-        from: '"Bienes Raíces" <no-reply@bienesraices.com>',
+    const { email, name, token } = data;
+
+    // Enviar el email
+    await transport.sendMail({
+        from: 'bienes_raices_230410',
         to: email,
-        subject: 'Cambio de Contraseña Confirmado',
+        subject: 'Restablece tu contraseña...',
+        text: `Estimado ${name}, has solicitado el cambio de contraseña de tu cuenta en BienesRaices_230410.`,
         html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
+               <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; background-color: #f9f9f9;">
                 <h2 style="text-align: center; color: #4CAF50;">¡Hola, ${name}!</h2>
                 <p style="font-size: 1rem; margin: 15px 0;">
                     Hemos recibido una solicitud de cambio de contraseña en tu cuenta. Si no fuiste tú, por favor, ignora este mensaje.
                 </p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/passwordRecovery/${token}" 
+                        style="background-color: #3498DB; color: white; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-size: 18px;">
+                        Restablecer Contraseña
+                    </a>
+                </div>
                 <p style="font-size: 0.9rem; margin: 15px 0; color: #666;">
                     Si tuviste algún problema o no solicitaste este cambio, por favor contacta con nuestro soporte.
                 </p>
@@ -78,12 +84,7 @@ export const emailAfterPasswordChange = async ({ name, email }) => {
                 </footer>
             </div>
         `,
-    };
+    });
+}
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Correo de confirmación enviado correctamente');
-    } catch (error) {
-        console.error('Error al enviar el correo de confirmación:', error);
-    }
-};
+export { registerEmail, passwordRecoveryEmail };

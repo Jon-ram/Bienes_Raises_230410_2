@@ -1,41 +1,42 @@
 import express from 'express';
-import generalRoutes from './Routes/generalRoutes.js'
-import userRoutes from './Routes/userRoutes.js'
-import db from './db/config.js'
-import dotenv from 'dotenv'
+import generalRoutes from './routes/generalRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import propertyRoutes from './routes/properties.js'
+import db from './db/config.js';
+import csrf from 'csurf';
+import cookieParser from 'cookie-parser';
 
-dotenv.config({path: '.env'})
-
-//conexión a la base de datos.
-try{
-    await db.authenticate();  //verifica las credenciales del usuario
-    await db.sync(); //sincronizo las tablas con los modelos
-    console.log("Conexión correcta a la Base de Datos");
-
-}catch(error){
+// Conexión a la base de datos
+try {
+    await db.authenticate(); // Verifica las credenciales del usuario 
+    db.sync();
+    console.log('Conexión correcta a la base de datos');
+} catch (error) {
     console.log(error);
 }
 
-const app=express()
+const app = express();
 
-//Habilitar la lectura de datos de formularios
-app.use(express.urlencoded({ extended: true }));
-
-
- 
-//Habilitar Pug 
-app.set('view engine', 'pug')
-app.set('views', './views')
-
-//Definir la carpeta pública de recursos estáticos (assets)
+// Definir la carpeta pública de recursos estáticos
 app.use(express.static('./public'));
 
+// Habilitar la lectura de datos desde formularios
+app.use(express.urlencoded({ extended: true }));
 
-// configuramos nuestro servidor web
-const port= process.env.BACKEND_PORT; 
-app.listen(port, ()=>{
-    console.log(`La aplicación ha iniciado al puerto: ${port}`);
-})
+// Habilitar Cookie Parser y CSRF
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
-app.use('/',generalRoutes);
-app.use('/auth/',userRoutes);
+// Routing
+app.use('/', generalRoutes);
+app.use('/auth', userRoutes);
+app.use('/properties', propertyRoutes); // Ruta de propiedades
+// Habilitar Pug
+app.set('view engine', 'pug');
+app.set('views', './views');
+
+// Configuración del servidor
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`La aplicación ha iniciado en el puerto: ${port}`);
+});

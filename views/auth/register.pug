@@ -1,28 +1,92 @@
 extends ../layout/index
 
 block contenido
-     div.py-10 
-        h2.text-center.font-extrabold.my-10.text-4xl.text-vino Bienes
-            span.font-normal.text-black Raíces
-        h2.text-center.font-extrabold.text-2xl.text-black= page
+    div.py-10
+        h1.text-center.font-extrabold.my-10.text-4xl.text-vino Bienes 
+            span.font-normal.text-negro Raíces
+        h2.text-center.font-extrabold.text-2xl= page
 
+        if errors
+            div(class="max-w-md mx-auto my-10")
+                each error in errors
+                    div(class="bg-vino text-blanco p-4 rounded-md flex items-center justify-between mb-2 alert fade-in")
+                        if error.msg == "El nombre no puede ir vacío"
+                            i(class="fas fa-user-times mr-2")  
+                        else if error.msg == "El correo electrónico es un campo obligatorio"
+                            i(class="fas fa-envelope-open-text mr-2")  
+                        else if error.msg == "El correo electrónico no tiene el formato correcto"
+                            i(class="fas fa-exclamation-triangle mr-2")
+                        else if error.msg == "La contraseña es un campo obligatorio"
+                            i(class="fas fa-key mr-2")  
+                        else if error.msg == "El Password debe ser de al menos 8 caracteres"
+                            i(class="fas fa-lock mr-2") 
+                        p(class="text-sm font-bold")= error.msg
+                        button(class="ml-2 bg-transparent border-0 text-blanco" onclick="this.parentElement.style.display='none'") &times;
+                        
         .mt-8.mx-auto.max-w-md
-          .bg-white.py-8.px-4.shadow
-           form(method="POST" action='/auth/newUser' noValidate).space-y-5.px-6
-            div 
-               label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold Nombre Completo:
-               input#name.w-full.px-3.py-2.border.border-gray-300.rounded-xl.placeholder-gray-400(type="text"  placeholder="Ingresa el nombre con apellidos" name="nombre_usuario")
-            div            
-               label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold Correo Electrónico:
-               input#email.w-full.px-3.py-2.border.border-gray-300.rounded-xl.placeholder-gray-400(type="email"  placeholder="ej: usuario@dominio.com" name="correo_usuario")
-            div
-               label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold Contraseña:
-               input#password.w-full.px-3.py-2.border.border-gray-300.rounded-xl.placeholder-gray-400(type="password"  placeholder="Mínimo de 8 carácteres" name="pass_usuario")
-            div
-               label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold Confirmación Contraseña:
-               input#password-confirm.w-full.px-3.py-2.border.border-gray-300.rounded-xl.placeholder-gray-400(type="password"  placeholder="Mínimo de 8 carácteres, igual a la anterior" name="pass2_usuario")
-            .flex.items-center.justify-between 
-                a.text-gray-500.text-xs(href="/auth/login") ¿Ya tienes cuenta? Inicia Sesión
-                a.text-gray-500.text-xs(href='/auth/passwordRecovery') Olvidé mi Password...
-            div
-               input(class="w-full bg-vino hover:bg-gris text-white font-bold py-3 cursor-pointer" type="submit" value="Crear Cuenta")
+            .bg-gris.py-8.px-4.shadow
+                form(method="POST" action="/auth/newUser" ).space-y-5.px-6
+                    input(type="hidden" name="_csrf" value= csrfToken)
+                    div
+                        label.block.text-sm.uppercase.text-negro.mb-2.font-bold Nombre Completo: 
+                        input#name.w-full.px-3.py-2.border-2.border-negro.rounded-md(type="text" placeholder="Jonathan Baldemar" name="name" value=User && User.name || "")
+                    div
+                        label.block.text-sm.uppercase.text-gris.mb-2.font-bold Email de Registro: 
+                        input#email.w-full.px-3.py-2.border-2.border-negro.rounded-md(type="email" placeholder="usuario@gmail.com" name="correo_usuario" value=User && User.email || "")
+                    div
+                        label.block.text-sm.uppercase.text-negro.mb-2.font-bold Fecha de Nacimiento: 
+                        input#birthdate.w-full.px-3.py-2.border-2.border-negro.rounded-md(type="date" name="fecha_nacimiento" value=User && User.fecha_nacimiento || "")
+                    div
+                        label.block.text-sm.uppercase.text-negro.mb-2.font-bold Contraseña: 
+                        input#password.w-full.px-3.py-2.border-2.border-negro.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="pass_usuario")
+                    div
+                        label.block.text-sm.uppercase.text-negro.mb-2.font-bold Confirmar Contraseña: 
+                        input#password2.w-full.px-3.py-2.border-2.border-negro.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="pass2_usuario")
+                    div.flex.items-center.justify-between
+                        a.text-negro.text-xs(href="/auth/login" class="hover:underline decoration-2 hover:decoration-vino") ¿Ya tienes cuenta? Inicia Sesión
+                        a.text-negro.text-xs(href="/auth/passwordRecovery" class="hover:underline decoration-2 hover:decoration-vino") Recuperar Contraseña
+                    input(class="w-full bg-naranja hover:bg-vino text-negro font-bold py-3 cursor-pointer" type="submit" value="Crear Cuenta")
+
+    script.
+        document.querySelectorAll('.alert').forEach(error => {
+            setTimeout(() => {
+                error.classList.add('fade-out');  
+                setTimeout(() => {
+                    error.style.display = 'none';
+                }, 1000);  
+            }, 7000);  
+        });
+
+    style.
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-in-out;
+        }
+
+        .alert:hover {
+            transform: translateX(10px);  
+            cursor: pointer; 
+            transition: transform 0.3s ease; 
+        }

@@ -1,39 +1,35 @@
 import express from 'express';
+import { formularioLogin,formularioRegister,formularioPasswordRecovery,createNewUser,confirm, resetPassword,checkToken,newPassword,authenticate} from '../controllers/userController.js';
 
-import {formularioLogin, formularioRegister, createNewUser,confirm, formularioPasswordRecovery,recuperarPassword} from '../controllers/userController.js';
-const router = express.Router()
+const router =  express.Router();
 
-//GET- se utiliza para la lectura de datos e informacion del servidor al cliente
-//EndPoint- son las rutas para acceder a las secciones o funciones de nuestra aplicacion web
-//2 componentes de una peticion ruta (a donde voy), funcion callback (que hago)
-//":" en una ruta define de manera posicional los parametros de entrada 
-router.get("/busquedaPorID/:id", (request, response)=>{
+
+//GET - Se utiliza para la lectura de datos e información del servidor al cliente
+//ENDPOINTS - son las rutas para acceder a las secciones o funciones de nuestra aplicación web
+// 2 componentes de una petición ruta (a donde voy), función callback (que hago)
+// ":" en una ruta define de manera posicional los parametros de entrada
+router.get("/busquedaPorID/:id", function (request, response){
     response.send(`Se esta solicitando buscar al usuario con ID: ${request.params.id}`)
-})  //2 componentes de una petición - ruta -callback
+})   //2 componentes de una petición ruta y función callback - La ruta es la que pide la información el callback es lo que se va a hacer
 
-//POST- se utiliza para el envio de datos e inforamción del cliente al servidor 
-router.post("/newUser", createNewUser);
+//POST - se utiliza para el envío de datos e información del cliente al servidor
+router.post("/newUser",createNewUser)
 
-//PUT- se utiliza para la actualizacion total de informacion del cliente al servidor 
+//PUT - se utiliza para la actualización total de información del cliente al servidor
+router.put("/replaceUserByEmail/:name/:email/:password", function(a,b){
+    b.send(`Se ha solicitado el remplazo de toda la información del usuario: ${a.params.name}, con correo: ${a.params.email} y contraseña: ${a.params.password}`)
+})
 
-router.put("/replaceUserByEmail/:name/:email/:password", function(a, b){
-    b.send(`Se esta solicitado la reemplazo de toda la información del usuario: ${a.params.name},
-        con correo: ${a.params.email} y contraseña: ${a.params.password}`)
-}) 
-
-//PATCH- S e utiliza para la actualización parcial
+//PATCH - se utiliza para actualización parcial
 router.patch("/updatePassword/:email/:newPassword/:newPasswordConfirm", function(request,response){
-    const {email, newPassword, newPasswordConfirm }= request.params //destructuracion de un objeto
-
-    if(newPassword===newPasswordConfirm)
+    const{email,newPassword,newPasswordConfirm } = request.params //Destructuración de un objeto
+    if(newPassword === newPasswordConfirm)
     {
-        response.send(`Se a solicitado la actualizacion de la contraseña del ususario con correo: ${email}, se aceptan los cambios ya que la constraseña y confirmacion son la misma`)
+        response.send(`Se ha solicitado la actualización de la contraseña del usuario con el mismo correo: ${email}, se aceptan los cambios ya que la contraseña y confirmación son la misma.`)
         console.log(newPassword);
         console.log(newPasswordConfirm);
-    }
-    else
-    {
-        response.send(`Se a solicitado la actualizacion de la contraseña del ususario con correo: ${email} con la nueva contraseña ${newPassword}, pero se reachaza el cambio dado que la nueva contraseña y su confirmacion no coincidan`)
+    }else{
+        response.send(`Se ha solicitado la actualización de la contraseña del usuario con correo: ${email} con la nueva contraseña ${newPassword}, pero se rechaza el cambio dado que la nueva contraseña y su confirmación no coinciden.`)
         console.log(newPassword);
         console.log(newPasswordConfirm);
     }
@@ -41,16 +37,21 @@ router.patch("/updatePassword/:email/:newPassword/:newPasswordConfirm", function
 
 //DELETE
 router.delete("/deleteUser/:email", function(request,response){
-    response.send(`Se esta solicitando la eliminacion del usuario asociado al correo: ${request.params.email}`)
+    response.send(`Se ha solicitado la eliminación del usuario asociado al correo: ${request.params.email}`)
 })
 
-router.get("/passwordRecovery", formularioPasswordRecovery);
-router.post("/resetPassword", recuperarPassword);
+// Rutas de autenticación
+router.get("/login", formularioLogin);
+router.post("/login", authenticate);
 
-router.get("/login", formularioLogin)
-router.get("/createAccount", formularioRegister)
-router.get("/passwordRecovery", formularioPasswordRecovery)
-router.get("/confirmAccount/:token", confirm)
-router.post("/createAccount", createNewUser)
+router.get("/createAccount", formularioRegister);
+router.post("/createAccount", createNewUser);
+
+router.get("/passwordRecovery", formularioPasswordRecovery);
+router.post("/passwordRecovery", resetPassword);
+
+router.get('/confirm/:token', confirm);
+router.get('/passwordRecovery/:token', checkToken);
+router.post('/passwordRecovery/:token', newPassword);
 
 export default router;

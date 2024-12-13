@@ -4,11 +4,11 @@ export default {
   theme: {
     extend: {
       colors:{
-        negro:'#120309',
-        vino:'#9A031E',
-        naranja:'#CB793A',
-        gris:'#8D89A6',
-        blanco:'#FFFFFF'
+        negro: '#120309',
+        vino: '#9A031E',
+        naranja: '#CB793A',
+        gris: '#8D89A6',
+        blanco: '#FFFFFF'
       },
     },
   },
